@@ -39,7 +39,18 @@ public class EarthquakeCityMap extends PApplet {
 	public static final float THRESHOLD_MODERATE = 5;
 	// Less than this threshold is a minor earthquake
 	public static final float THRESHOLD_LIGHT = 4;
-
+	//Large marker value
+	public static final float LARGE_MARKER = 24;
+	//Medium marker value
+	public static final float MEDIUM_MARKER = 12;
+	//Small marker value
+	public static final float SMALL_MARKER = 6;
+	//Set the colors for the markers
+	public final int YELLOW = color(255, 255, 0);
+	public final int BLUE = color(0, 0, 255);
+	public final int RED = color(255, 0, 0);
+	
+	
 	/** This is where to find the local tiles, for working without an Internet connection */
 	public static String mbTilesString = "blankLight-1-3.mbtiles";
 	
@@ -85,18 +96,39 @@ public class EarthquakeCityMap extends PApplet {
 	    
 	    // Here is an example of how to use Processing's color method to generate 
 	    // an int that represents the color yellow.  
-	    int yellow = color(255, 255, 0);
+	    //int yellow = color(255, 255, 0);
 	    
-	    //TODO: Add code here as appropriate
+	
+	    for (PointFeature quake : earthquakes){
+	    	markers.add(createMarker(quake));
+	    }
+	    map.addMarkers(markers);
 	}
 		
 	// A suggested helper method that takes in an earthquake feature and 
 	// returns a SimplePointMarker for that earthquake
-	// TODO: Implement this method and call it from setUp, if it helps
+	
 	private SimplePointMarker createMarker(PointFeature feature)
 	{
-		// finish implementing and use this method, if it helps.
-		return new SimplePointMarker(feature.getLocation());
+		
+		//create the marker 
+		SimplePointMarker marker = new SimplePointMarker(feature.getLocation());
+		
+		//Get the magnitude field and parse it to a float via a string
+		float mag = Float.parseFloat(feature.getProperty("magnitude").toString());
+		
+		if (mag > THRESHOLD_MODERATE){
+			marker.setRadius(LARGE_MARKER);
+			marker.setColor(RED);
+		}else if(mag > THRESHOLD_LIGHT){
+			marker.setRadius(MEDIUM_MARKER);
+			marker.setColor(YELLOW);
+		}else{
+			marker.setRadius(SMALL_MARKER);
+			marker.setColor(BLUE);
+		}
+		
+		return marker;
 	}
 	
 	public void draw() {
@@ -107,10 +139,24 @@ public class EarthquakeCityMap extends PApplet {
 
 
 	// helper method to draw key in GUI
-	// TODO: Implement this method to draw the key
+	
 	private void addKey() 
 	{	
-		// Remember you can use Processing's graphics methods here
-	
+		fill(255, 255, 255);
+		rect(25, 50, 150, 300);
+		fill(0);
+		textSize(16);
+		text("Earthquake Key", 35, 75);
+		fill(RED);
+		ellipse(50, 125, LARGE_MARKER, LARGE_MARKER);
+		fill(YELLOW);
+		ellipse(50, 175, MEDIUM_MARKER, MEDIUM_MARKER);
+		fill(BLUE);
+		ellipse(50, 225, SMALL_MARKER, SMALL_MARKER);
+		fill(0);
+		textSize(12);
+		text("5.0+ Magnitude", 65, 130);
+		text("4.0+ Magnitude", 65, 180);
+		text("<4.0 Magnitude", 65, 230);
 	}
 }
